@@ -53,6 +53,11 @@ class StackUpdate(object):
     def __call__(self):
         """Return a co-routine that updates the stack."""
 
+        cleanup_failed = scheduler.DependencyTaskGroup(
+            self.existing_stack.dependencies,
+            self._remove_failed_resource,
+            reverse=True)
+
         cleanup_prev = scheduler.DependencyTaskGroup(
             self.previous_stack.dependencies,
             self._remove_backup_resource,
@@ -62,6 +67,7 @@ class StackUpdate(object):
                                                self._resource_update)
 
         if not self.rollback:
+            yield cleanup_failed()
             yield cleanup_prev()
 
         try:
@@ -81,6 +87,19 @@ class StackUpdate(object):
                                   (prev_res.DELETE, prev_res.COMPLETE)):
             logger.debug(_("Deleting backup resource %s") % prev_res.name)
             yield prev_res.destroy()
+
+    @scheduler.wrappertask
+    def _remove_failed_resource(self, existing_res):
+        if existing_res.state == (existing_res.CREATE, existing_res.FAILED):
+            # Delete from existing stack so it appears as a new resource in
+            # new stack.
+            logger.debug(_("Removing failed resource %s from existing stack") %
+                         existing_res.name)
+            del existing_res.stack.resources[existing_res.name]
+            # Delete from previous stack so it is not cleaned up twice
+            del self.previous_stack.resources[existing_res.name]
+            logger.debug(_("Deleting failed resource %s") % existing_res.name)
+            yield existing_res.destroy()
 
     @staticmethod
     def _exchange_stacks(existing_res, prev_res):

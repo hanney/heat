@@ -1502,11 +1502,36 @@ class StackTest(HeatTestCase):
                                   action=parser.Stack.CREATE,
                                   status=parser.Stack.FAILED)
         self.stack.store()
+        self.assertEqual(self.stack.state,
+                         (parser.Stack.CREATE, parser.Stack.FAILED))
+        updated_stack = parser.Stack(self.ctx, 'test_stack',
+                                     parser.Template({}))
+        self.stack.update(updated_stack)
+        self.assertEqual(self.stack.state,
+                         (parser.Stack.UPDATE, parser.Stack.COMPLETE))
+
+    @utils.stack_delete_after
+    def test_update_replaces_failed_resources(self):
+        tmpl = {'Resources': {'AResource': {'Type': 'GenericResourceType'}}}
+        self.stack = parser.Stack(self.ctx, 'test_stack_update_replaces',
+                                  parser.Template(tmpl),
+                                  action=parser.Stack.CREATE,
+                                  status=parser.Stack.FAILED)
+        stack_id = self.stack.store()
+        self.stack.resources['AResource'].state_set(parser.Stack.CREATE,
+                                                    parser.Stack.FAILED)
         self.assertEqual((parser.Stack.CREATE, parser.Stack.FAILED),
                          self.stack.state)
-        self.stack.update(mock.Mock())
-        self.assertEqual((parser.Stack.UPDATE, parser.Stack.FAILED),
+        res = generic_rsrc.GenericResource
+        self.assertEqual((res.CREATE, res.FAILED),
+                         self.stack.resources['AResource'].state)
+        updated_stack = parser.Stack(self.ctx, 'test_stack_update_replaces',
+                                     parser.Template(tmpl))
+        self.stack.update(updated_stack)
+        self.assertEqual((parser.Stack.UPDATE, parser.Stack.COMPLETE),
                          self.stack.state)
+        self.assertEqual((res.CREATE, res.COMPLETE),
+                         self.stack.resources['AResource'].state)
 
     @utils.stack_delete_after
     def test_resource_by_refid(self):
