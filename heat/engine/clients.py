@@ -93,6 +93,8 @@ class OpenStackClients(object):
         return self._keystone
 
     def url_for(self, **kwargs):
+        if self.context.region_name and 'region_name' not in kwargs:
+            kwargs['region_name'] = self.context.region_name
         return self.keystone().url_for(**kwargs)
 
     def nova(self, service_type='compute'):

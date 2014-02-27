@@ -35,6 +35,7 @@ class TestRequestContext(HeatTestCase):
                     'tenant_id': '456tenant',
                     'user_id': 'fooUser',
                     'tenant': 'atenant',
+                    'region_name': None,
                     'auth_url': 'http://xyz',
                     'aws_creds': 'blah'}
 

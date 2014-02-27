@@ -35,10 +35,10 @@ class RequestContext(context.RequestContext):
 
     def __init__(self, auth_token=None, username=None, password=None,
                  aws_creds=None, tenant=None, user_id=None,
-                 tenant_id=None, auth_url=None, roles=None, is_admin=None,
-                 read_only=False, show_deleted=False,
-                 overwrite=True, trust_id=None, trustor_user_id=None,
-                 request_id=None, **kwargs):
+                 tenant_id=None, auth_url=None, region_name=None,
+                 roles=None, is_admin=None, read_only=False,
+                 show_deleted=False, overwrite=True, trust_id=None,
+                 trustor_user_id=None, request_id=None, **kwargs):
         """
         :param overwrite: Set to False to ensure that the greenthread local
             copy of the index is not overwritten.
@@ -59,6 +59,7 @@ class RequestContext(context.RequestContext):
         self.aws_creds = aws_creds
         self.tenant_id = tenant_id
         self.auth_url = auth_url
+        self.region_name = region_name
         self.roles = roles or []
         if overwrite or not hasattr(local.store, 'context'):
             self.update_store()
@@ -92,6 +93,7 @@ class RequestContext(context.RequestContext):
                 'trust_id': self.trust_id,
                 'trustor_user_id': self.trustor_user_id,
                 'auth_url': self.auth_url,
+                'region_name': self.region_name,
                 'roles': self.roles,
                 'is_admin': self.is_admin,
                 'user': self.user,

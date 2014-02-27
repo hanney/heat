@@ -49,6 +49,8 @@ from heat.openstack.common import importutils
 
 URL_LENGTH_LIMIT = 50000
 
+eventlet.wsgi.MAX_HEADER_LINE = 65536
+
 api_opts = [
     cfg.StrOpt('bind_host', default='0.0.0.0',
                help=_('Address to bind the server. Useful when '
