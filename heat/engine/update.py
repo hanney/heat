@@ -14,6 +14,8 @@
 
 import copy
 
+from oslo.config import cfg
+
 from heat.db import api as db_api
 
 from heat.engine import dependencies
@@ -90,11 +92,15 @@ class StackUpdate(object):
 
     @scheduler.wrappertask
     def _remove_failed_resource(self, existing_res):
-        if existing_res.state == (existing_res.CREATE, existing_res.FAILED):
+        if existing_res.state in [(existing_res.CREATE, existing_res.FAILED),
+                                  (existing_res.INIT, existing_res.COMPLETE),
+                                  (existing_res.UPDATE, existing_res.FAILED)]:
             # Delete from existing stack so it appears as a new resource in
             # new stack.
             logger.debug(_("Removing failed resource %s from existing stack") %
                          existing_res.name)
+            if cfg.CONF.abandon_failed_resource:
+                existing_res.t['DeletionPolicy'] = resource.RETAIN
             del existing_res.stack.resources[existing_res.name]
             # Delete from previous stack so it is not cleaned up twice
             del self.previous_stack.resources[existing_res.name]

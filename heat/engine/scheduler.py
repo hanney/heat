@@ -19,6 +19,8 @@ import sys
 import types
 from time import time as wallclock
 
+from oslo.config import cfg
+
 from heat.openstack.common import excutils
 from heat.openstack.common import log as logging
 from heat.openstack.common.gettextutils import _
@@ -309,6 +311,10 @@ class DependencyTaskGroup(object):
         self._runners = dict((o, TaskRunner(task, o)) for o in dependencies)
         self._graph = dependencies.graph(reverse=reverse)
         self.aggregate_exceptions = aggregate_exceptions
+        self.task_running_limit = \
+            cfg.CONF.simultaneous_creation_limit
+        self.ignore_failures = \
+            cfg.CONF.ignore_resource_failures
 
         if name is None:
             name = '(%s) %s' % (getattr(task, '__name__',
@@ -326,26 +332,43 @@ class DependencyTaskGroup(object):
         try:
             while any(self._runners.itervalues()):
                 try:
+                    running = lambda (k, r): k in self._graph and r.started()
+                    count = len(filter(running, self._runners.iteritems()))
+                    to_start = self.task_running_limit - count
                     for k, r in self._ready():
-                        r.start()
+                        if to_start > 0:
+                            try:
+                                r.start()
+                            except Exception as e:
+                                raised_exceptions.append(e)
+                                if not self.ignore_failures:
+                                    raise
+
+                            to_start -= 1
 
                     yield
 
                     for k, r in self._running():
-                        if r.step():
-                            del self._graph[k]
+                        try:
+                            if r.step():
+                                del self._graph[k]
+                        except Exception as e:
+                            raised_exceptions.append(e)
+                            if not self.ignore_failures:
+                                self._cancel_recursively(k, r)
+                                raise
                 except Exception as e:
-                    self._cancel_recursively(k, r)
-                    if not self.aggregate_exceptions:
-                        raise
                     raised_exceptions.append(e)
+                    if not self.ignore_failures:
+                        self._cancel_recursively(k, r)
+                        raise
         except:
             with excutils.save_and_reraise_exception():
                 for r in self._runners.itervalues():
                     r.cancel()
 
         if raised_exceptions:
-            raise ExceptionGroup(raised_exceptions)
+            raise raised_exceptions[0]
 
     def _cancel_recursively(self, key, runner):
         runner.cancel()
