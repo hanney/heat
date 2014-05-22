@@ -27,6 +27,7 @@ from heat.common import exception
 from heat.common import identifier
 from heat.common import messaging as rpc_messaging
 from heat.db import api as db_api
+from heat.discovery import discovery
 from heat.engine import api
 from heat.engine import attributes
 from heat.engine import clients
@@ -1230,3 +1231,29 @@ class EngineService(service.Service):
     @request_context
     def delete_software_deployment(self, cnxt, deployment_id):
         db_api.software_deployment_delete(cnxt, deployment_id)
+
+    @request_context
+    def init_discovery(self, cnxt):
+        ids = discovery.init(cnxt)
+        json = dict(zip(xrange(len(ids)), ids))
+        values = {
+            'tenant': cnxt.tenant_id,
+            'resources': json
+        }
+        try:
+            db_api.discovery_update(cnxt, cnxt.tenant_id, values)
+        except exception.NotFound:
+            db_api.discovery_create(cnxt, values)
+
+        print resources
+
+    @request_context
+    def dump_discovery(self, cnxt, snapshot_servers):
+        ids = []
+        try:
+            result = db_api.discovery_get(cnxt, cnxt.tenant_id)
+            ids = [id for _, id in result.resources.iteritems()]
+        except exception.NotFound:
+            pass
+        template = discovery.dump(cnxt, ids, snapshot_servers)
+        return template

@@ -341,3 +341,12 @@ class Snapshot(BASE, HeatBase):
     status = sqlalchemy.Column('status', sqlalchemy.String(255))
     status_reason = sqlalchemy.Column('status_reason', sqlalchemy.String(255))
     stack = relationship(Stack, backref=backref('snapshot'))
+
+
+class Discovery(BASE, HeatBase):
+
+    __tablename__ = 'discovery'
+
+    tenant = sqlalchemy.Column(
+        'tenant', sqlalchemy.String(255), primary_key=True, nullable=True)
+    resources = sqlalchemy.Column('resources', Json)

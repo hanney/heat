@@ -458,3 +458,10 @@ class EngineClient(object):
     def delete_software_deployment(self, cnxt, deployment_id):
         return self.call(cnxt, self.make_msg('delete_software_deployment',
                                              deployment_id=deployment_id))
+
+    def init_discovery(self, cnxt):
+        return self.call(cnxt, self.make_msg('init_discovery'))
+
+    def dump_discovery(self, cnxt, snapshot_servers=None):
+        return self.call(cnxt, self.make_msg('dump_discovery',
+                                             snapshot_servers=snapshot_servers))

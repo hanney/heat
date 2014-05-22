@@ -222,3 +222,9 @@ SOFTWARE_DEPLOYMENT_KEYS = (
     'status',
     'status_reason'
 )
+
+DISCOVERY_DUMP_KEYS = (
+    DISCOVERY_DUMP_SNAPSHOT_SERVERS
+) = (
+    'snapshot_servers'
+)

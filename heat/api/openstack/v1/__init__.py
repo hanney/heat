@@ -20,6 +20,7 @@ from heat.api.openstack.v1 import resources
 from heat.api.openstack.v1 import software_configs
 from heat.api.openstack.v1 import software_deployments
 from heat.api.openstack.v1 import stacks
+from heat.api.openstack.v1 import discovery
 from heat.common import wsgi
 
 
@@ -243,5 +244,22 @@ class API(wsgi.Router):
                               "/{deployment_id}",
                               action="delete",
                               conditions={'method': 'DELETE'})
+
+        # Discovery
+        discovery_resource = discovery.create_resource(conf)
+        with mapper.submapper(
+            controller=discovery_resource,
+            path_prefix='/{tenant_id}/discovery'
+        ) as sa_mapper:
+
+            sa_mapper.connect("discovery_init",
+                              "/init",
+                              action="init",
+                              conditions={'method': 'GET'})
+
+            sa_mapper.connect("discovery_dump",
+                              "/dump",
+                              action="dump",
+                              conditions={'method': 'POST'})
 
         super(API, self).__init__(mapper)

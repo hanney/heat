@@ -757,6 +757,36 @@ def snapshot_delete(context, snapshot_id):
     session.flush()
 
 
+def discovery_create(context, values):
+    obj_ref = models.Discovery()
+    obj_ref.update(values)
+    obj_ref.save(_session(context))
+    return obj_ref
+
+
+def discovery_get(context, discovery_id):
+    result = model_query(context, models.Discovery).get(discovery_id)
+
+    if not result:
+        raise exception.NotFound(_('Discovery with id %s not found') %
+                                 discovery_id)
+    return result
+
+
+def discovery_update(context, discovery_id, values):
+    discovery = discovery_get(context, discovery_id)
+    discovery.update(values)
+    discovery.save(_session(context))
+    return discovery
+
+
+def discovery_delete(context, discovery_id):
+    discovery = discovery_get(context, discovery_id)
+    session = Session.object_session(discovery)
+    session.delete(discovery)
+    session.flush()
+
+
 def purge_deleted(age, granularity='days'):
     try:
         age = int(age)
