@@ -748,6 +748,47 @@ def snapshot_delete(context, snapshot_id):
     session.flush()
 
 
+def template_catalogue_create(context, values):
+    obj_ref = models.TemplateCatalogue()
+    obj_ref.update(values)
+    obj_ref.save(_session(context))
+    return obj_ref
+
+
+def template_catalogue_get(context, template_catalogue_id):
+    result = model_query(context, models.TemplateCatalogue).get(
+        template_catalogue_id)
+
+    if not result:
+        raise exception.NotFound(_('Template Catalogue with id %s not found') %
+                                 template_catalogue_id)
+    return result
+
+
+def template_catalogue_get_all_by_tenant(context):
+    rules = sqlalchemy.or_(
+        models.TemplateCatalogue.tenant == context.tenant_id,
+        models.TemplateCatalogue.public == 1)
+
+    result = model_query(context, models.TemplateCatalogue).filter(rules).all()
+
+    return result
+
+
+def template_catalogue_update(context, template_catalogue_id, values):
+    template_catalogue = template_catalogue_get(context, template_catalogue_id)
+    template_catalogue.update(values)
+    template_catalogue.save(_session(context))
+    return template_catalogue
+
+
+def template_catalogue_delete(context, template_catalogue_id):
+    template_catalogue = template_catalogue_get(context, template_catalogue_id)
+    session = Session.object_session(template_catalogue)
+    session.delete(template_catalogue)
+    session.flush()
+
+
 def purge_deleted(age, granularity='days'):
     try:
         age = int(age)

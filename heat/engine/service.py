@@ -1211,3 +1211,33 @@ class EngineService(service.Service):
     @request_context
     def delete_software_deployment(self, cnxt, deployment_id):
         db_api.software_deployment_delete(cnxt, deployment_id)
+
+    @request_context
+    def list_template_catalogue(self, ctxt):
+        result = []
+        tcs = db_api.template_catalogue_get_all_by_tenant(ctxt)
+        for tc in tcs:
+            result.append(api.format_template_catalogue(tc))
+        return result
+
+    @request_context
+    def show_template_catalogue(self, ctxt, template_catalogue_id):
+        tc = db_api.template_catalogue_get(ctxt, template_catalogue_id)
+        return api.format_template_catalogue(tc)
+
+    @request_context
+    def add_template_catalogue(self, ctxt, name, preview, public, template):
+        values = {
+            'name': name,
+            'preview': preview,
+            'public': public,
+            'tenant': ctxt.tenant_id,
+            'username': ctxt.username,
+            'template': {'raw': template}
+        }
+        tc = db_api.template_catalogue_create(ctxt, values)
+        return api.format_template_catalogue(tc)
+
+    @request_context
+    def delete_template_catalogue(self, ctxt, template_catalogue_id):
+        db_api.template_catalogue_delete(ctxt, template_catalogue_id)

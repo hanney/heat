@@ -341,3 +341,16 @@ class Snapshot(BASE, HeatBase):
     status = sqlalchemy.Column('status', sqlalchemy.String(255))
     status_reason = sqlalchemy.Column('status_reason', sqlalchemy.String(255))
     stack = relationship(Stack, backref=backref('snapshot'))
+
+
+class TemplateCatalogue(BASE, HeatBase):
+
+    __tablename__ = 'template_catalogue'
+
+    id = sqlalchemy.Column(sqlalchemy.String(36), primary_key=True,
+                           default=lambda: str(uuid.uuid4()))
+    name = sqlalchemy.Column(sqlalchemy.String(255))
+    preview = sqlalchemy.Column(sqlalchemy.String(255))
+    public = sqlalchemy.Column(sqlalchemy.Boolean, nullable=False)
+    tenant = sqlalchemy.Column(sqlalchemy.String(256))
+    template = sqlalchemy.Column(Json)

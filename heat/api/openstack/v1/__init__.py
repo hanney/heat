@@ -20,6 +20,7 @@ from heat.api.openstack.v1 import resources
 from heat.api.openstack.v1 import software_configs
 from heat.api.openstack.v1 import software_deployments
 from heat.api.openstack.v1 import stacks
+from heat.api.openstack.v1 import template_catalogue
 from heat.common import wsgi
 
 
@@ -241,6 +242,33 @@ class API(wsgi.Router):
 
             sa_mapper.connect("software_deployment_delete",
                               "/{deployment_id}",
+                              action="delete",
+                              conditions={'method': 'DELETE'})
+
+        # Template catalogue
+        template_catalogue_resource = template_catalogue.create_resource(conf)
+        with mapper.submapper(
+            controller=template_catalogue_resource,
+            path_prefix='/{tenant_id}/template_catalogue'
+        ) as sa_mapper:
+
+            sa_mapper.connect("template_catalogue_index",
+                              "",
+                              action="index",
+                              conditions={'method': 'GET'})
+
+            sa_mapper.connect("template_catalogue_show",
+                              "/{template_catalogue_id}",
+                              action="show",
+                              conditions={'method': 'GET'})
+
+            sa_mapper.connect("template_catalogue_add",
+                              "",
+                              action="add",
+                              conditions={'method': 'POST'})
+
+            sa_mapper.connect("template_catalogue_delete",
+                              "/{template_catalogue_id}",
                               action="delete",
                               conditions={'method': 'DELETE'})
 

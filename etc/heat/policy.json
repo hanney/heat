@@ -60,5 +60,10 @@
     "software_deployments:show": "rule:deny_stack_user",
     "software_deployments:update": "rule:deny_stack_user",
     "software_deployments:delete": "rule:deny_stack_user",
-    "software_deployments:metadata": ""
+    "software_deployments:metadata": "",
+
+    "template_catalogue:index": "rule:deny_stack_user",
+    "template_catalogue:show": "rule:deny_stack_user",
+    "template_catalogue:add": "rule:deny_stack_user",
+    "template_catalogue:delete": "rule:deny_stack_user"
 }

@@ -389,8 +389,8 @@ class EngineClient(heat.openstack.common.rpc.proxy.RpcProxy):
                                              outputs=outputs,
                                              options=options))
 
-    def delete_software_config(self, cnxt, config_id):
-        return self.call(cnxt, self.make_msg('delete_software_config',
+    def delete_software_config(self, ctxt, config_id):
+        return self.call(ctxt, self.make_msg('delete_software_config',
                                              config_id=config_id))
 
     def list_software_deployments(self, cnxt, server_id=None):
@@ -435,3 +435,24 @@ class EngineClient(heat.openstack.common.rpc.proxy.RpcProxy):
     def delete_software_deployment(self, cnxt, deployment_id):
         return self.call(cnxt, self.make_msg('delete_software_deployment',
                                              deployment_id=deployment_id))
+
+    def list_template_catalogue(self, ctxt):
+        return self.call(ctxt, self.make_msg('list_template_catalogue'))
+
+    def show_template_catalogue(self, ctxt, template_catalogue_id):
+        return self.call(ctxt, self.make_msg('show_template_catalogue',
+                                             template_catalogue_id=
+                                             template_catalogue_id))
+
+    def add_template_catalogue(self, ctxt, name, preview, public, template):
+        return self.call(ctxt,
+                         self.make_msg('add_template_catalogue',
+                                       name=name,
+                                       preview=preview,
+                                       public=public,
+                                       template=template))
+
+    def delete_template_catalogue(self, ctxt, template_catalogue_id):
+        return self.call(ctxt, self.make_msg('delete_template_catalogue',
+                                             template_catalogue_id=
+                                             template_catalogue_id))

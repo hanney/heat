@@ -279,6 +279,43 @@ def snapshot_delete(context, snapshot_id):
     return IMPL.snapshot_delete(context, snapshot_id)
 
 
+def discovery_create(context, values):
+    return IMPL.discovery_create(context, values)
+
+
+def discovery_get(context, discovery_id):
+    return IMPL.discovery_get(context, discovery_id)
+
+
+def discovery_update(context, discovery_id, values):
+    return IMPL.discovery_update(context, discovery_id, values)
+
+
+def discovery_delete(context, discovery_id):
+    return IMPL.discovery_delete(context, discovery_id)
+
+
+def template_catalogue_create(context, values):
+    return IMPL.template_catalogue_create(context, values)
+
+
+def template_catalogue_get(context, template_catalogue_id):
+    return IMPL.template_catalogue_get(context, template_catalogue_id)
+
+
+def template_catalogue_get_all_by_tenant(context):
+    return IMPL.template_catalogue_get_all_by_tenant(context)
+
+
+def template_catalogue_update(context, template_catalogue_id, values):
+    return IMPL.template_catalogue_update(context, template_catalogue_id,
+                                          values)
+
+
+def template_catalogue_delete(context, template_catalogue_id):
+    return IMPL.template_catalogue_delete(context, template_catalogue_id)
+
+
 def db_sync(engine, version=None):
     """Migrate the database to `version` or the most recent version."""
     return IMPL.db_sync(engine, version=version)

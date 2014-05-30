@@ -216,3 +216,21 @@ SOFTWARE_DEPLOYMENT_KEYS = (
     'status',
     'status_reason'
 )
+
+TEMPLATE_CATALOGUE_KEYS = (
+    TEMPLATE_CATALOGUE_ID,
+    TEMPLATE_CATALOGUE_NAME,
+    TEMPLATE_CATALOGUE_DESCRIPTION,
+    TEMPLATE_CATALOGUE_PREVIEW,
+    TEMPLATE_CATALOGUE_PUBLIC,
+    TEMPLATE_CATALOGUE_TEMPLATE,
+    TEMPLATE_CATALOGUE_CREATION_AT
+) = (
+    'id',
+    'name',
+    'description',
+    'preview',
+    'public',
+    'template',
+    'creation_at'
+)

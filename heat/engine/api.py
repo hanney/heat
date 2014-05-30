@@ -342,3 +342,21 @@ def format_software_deployment(sd):
         api.SOFTWARE_DEPLOYMENT_CONFIG_ID: sd.config.id,
     }
     return result
+
+
+def format_template_catalogue(tc):
+    if tc is None:
+        return
+    tmpl_src = tc.template.get('raw')
+    tmpl = template_format.parse(tmpl_src)
+    result = {
+        api.TEMPLATE_CATALOGUE_ID: tc.id,
+        api.TEMPLATE_CATALOGUE_NAME: tc.name,
+        api.TEMPLATE_CATALOGUE_DESCRIPTION: tmpl.get('description') or
+                                            tmpl.get('Description'),
+        api.TEMPLATE_CATALOGUE_PREVIEW: tc.preview,
+        api.TEMPLATE_CATALOGUE_PUBLIC: tc.public,
+        api.TEMPLATE_CATALOGUE_TEMPLATE: tmpl_src,
+        api.TEMPLATE_CATALOGUE_CREATION_AT: tc.created_at
+    }
+    return result
