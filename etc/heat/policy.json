@@ -62,6 +62,7 @@
     "software_deployments:delete": "rule:deny_stack_user",
     "software_deployments:metadata": "",
 
-    "discovery:init": "rule:deny_stack_user",
+    "discovery:list": "rule:deny_stack_user",
+    "discovery:exclude": "rule:deny_stack_user",
     "discovery:dump": "rule:deny_stack_user"
 }

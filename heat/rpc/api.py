@@ -224,7 +224,13 @@ SOFTWARE_DEPLOYMENT_KEYS = (
 )
 
 DISCOVERY_DUMP_KEYS = (
-    DISCOVERY_DUMP_SNAPSHOT_SERVERS
+    DISCOVERY_DUMP_SNAPSHOT_SERVERS,
 ) = (
-    'snapshot_servers'
+    'snapshot_servers',
+)
+
+DISCOVERY_EXCLUDE_KEYS = (
+    DISCOVERY_EXCLUDE_RESOURCE,
+) = (
+    'resources',
 )

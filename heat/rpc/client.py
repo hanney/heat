@@ -459,8 +459,12 @@ class EngineClient(object):
         return self.call(cnxt, self.make_msg('delete_software_deployment',
                                              deployment_id=deployment_id))
 
-    def init_discovery(self, cnxt):
-        return self.call(cnxt, self.make_msg('init_discovery'))
+    def list_discovery(self, cnxt):
+        return self.call(cnxt, self.make_msg('list_discovery'))
+
+    def exclude_discovery(self, cnxt, resources=None):
+        return self.call(cnxt, self.make_msg('exclude_discovery',
+                                             resources=resources))
 
     def dump_discovery(self, cnxt, snapshot_servers=None):
         return self.call(cnxt, self.make_msg('dump_discovery',

@@ -1233,9 +1233,26 @@ class EngineService(service.Service):
         db_api.software_deployment_delete(cnxt, deployment_id)
 
     @request_context
-    def init_discovery(self, cnxt):
-        ids = discovery.init(cnxt)
-        json = dict(zip(xrange(len(ids)), ids))
+    def list_discovery(self, cnxt):
+        rsrcs = discovery.Discoverer(cnxt).list_resources()
+        rscrs_info = {}
+        for id, r in rsrcs.iteritems():
+            info = r.get_short_info()
+            info['excluded'] = False
+            rscrs_info[id] = info
+        excluded = []
+        try:
+            result = db_api.discovery_get(cnxt, cnxt.tenant_id)
+            excluded = [id for _, id in result.resources.iteritems()]
+        except exception.NotFound:
+            pass
+        for id in excluded:
+            rscrs_info[id]['excluded'] = True
+        return rscrs_info.values()
+
+    @request_context
+    def exclude_discovery(self, cnxt, resources):
+        json = dict(zip(xrange(len(resources)), resources))
         values = {
             'tenant': cnxt.tenant_id,
             'resources': json
@@ -1245,8 +1262,6 @@ class EngineService(service.Service):
         except exception.NotFound:
             db_api.discovery_create(cnxt, values)
 
-        print resources
-
     @request_context
     def dump_discovery(self, cnxt, snapshot_servers):
         ids = []
@@ -1255,5 +1270,6 @@ class EngineService(service.Service):
             ids = [id for _, id in result.resources.iteritems()]
         except exception.NotFound:
             pass
-        template = discovery.dump(cnxt, ids, snapshot_servers)
+        dumper = discovery.Dumper(cnxt, ids)
+        template = dumper.dump(snapshot_servers)
         return template

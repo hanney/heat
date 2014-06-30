@@ -35,16 +35,25 @@ class DiscoveryController(object):
         raise exc.HTTPNotFound()
 
     @util.policy_enforce
-    def init(self, req):
+    def list(self, req):
         """
-        Discover init state
+        List discovered resources.
         """
-        self.rpc_client.init_discovery(req.context)
+        resources = self.rpc_client.list_discovery(req.context)
+        return {'resources': resources}
+
+    @util.policy_enforce
+    def exclude(self, req, body):
+        """
+        Excludes given resources.
+        """
+        resources = body.get('resources', None)
+        self.rpc_client.exclude_discovery(req.context, resources)
 
     @util.policy_enforce
     def dump(self, req, body):
         """
-        Discover existing resources and dependencies
+        Generates template for discovered resources.
         """
         server_snapshot = body.get('create_server_snapshot', False)
         template = self.rpc_client.dump_discovery(req.context, server_snapshot)

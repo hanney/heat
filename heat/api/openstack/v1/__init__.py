@@ -252,10 +252,15 @@ class API(wsgi.Router):
             path_prefix='/{tenant_id}/discovery'
         ) as sa_mapper:
 
-            sa_mapper.connect("discovery_init",
-                              "/init",
-                              action="init",
+            sa_mapper.connect("discovery_list",
+                              "/list",
+                              action="list",
                               conditions={'method': 'GET'})
+
+            sa_mapper.connect("discovery_exclude",
+                              "/exclude",
+                              action="exclude",
+                              conditions={'method': 'POST'})
 
             sa_mapper.connect("discovery_dump",
                               "/dump",
